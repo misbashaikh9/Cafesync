@@ -1,0 +1,13 @@
+warning: in the working copy of 'Frontend/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'Frontend/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'Frontend/src/App.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'Server/index.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'test-wishlist.js', LF will be replaced by CRLF the next time Git touches it
+Frontend/package-lock.json
+Frontend/package.json
+Frontend/src/App.jsx
+Frontend/src/admin/index.js
+Frontend/src/admin/pages/AdminOrders.jsx
+Server/index.js
+auto-commit.ps1
+check-preparation-times.js
