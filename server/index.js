@@ -7,7 +7,7 @@ const fs = require('fs');
 const userModel = require('./models/Customer');
 const productModel = require('./models/Product');
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = 'your_jwt_secret_key'; // In production, use env variable
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_change_this_in_production';
 const cartModel = require('./models/Cart');
 const Order = require('./models/Order');
 const nodemailer = require('nodemailer');
@@ -34,7 +34,10 @@ function authenticateAdmin(req, res, next) {
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
+}));
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -87,7 +90,7 @@ function authenticateJWT(req, res, next) {
 }
 
 // 🔌 MongoDB Connection
-mongoose.connect('mongodb://127.0.0.1:27017/Cafeteria')
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/Cafeteria')
 .then(() => console.log("✅ MongoDB connected"))
 .catch((err) => console.error("❌ MongoDB connection error:", err));
 
@@ -484,6 +487,20 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: 'bh.cafe712@gmail.com',
     pass: 'lzhs ahan zbjg yzso'
+  },
+  // Add connection options to handle timeouts and connection issues
+  pool: true,
+  maxConnections: 1,
+  maxMessages: 3,
+  socketTimeout: 30000, // 30 seconds
+  connectionTimeout: 30000, // 30 seconds
+  greetingTimeout: 30000, // 30 seconds
+  // Try alternative ports if 465 fails
+  port: 587,
+  secure: false, // Use STARTTLS instead of SSL
+  requireTLS: true,
+  tls: {
+    rejectUnauthorized: false
   }
 });
 
@@ -1265,22 +1282,75 @@ app.get('/payment-methods', authenticateJWT, async (req, res) => {
   }
 });
 
+// Test email endpoint (for debugging)
+app.post('/test-email', async (req, res) => {
+  try {
+    console.log('🧪 Testing email service...');
+    
+    if (!transporter) {
+      console.error('❌ Email transporter not configured');
+      return res.status(500).json({ error: 'Email service not configured.' });
+    }
+    
+    const testResult = await transporter.sendMail({
+      from: 'bh.cafe712@gmail.com',
+      to: 'bh.cafe712@gmail.com', // Send to self for testing
+      subject: '🧪 Brew Haven - Email Service Test',
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0;">
+          <h2>Email Service Test</h2>
+          <p>This is a test email to verify that the email service is working correctly.</p>
+          <p><strong>Timestamp:</strong> ${new Date().toLocaleString()}</p>
+          <p><strong>Server:</strong> ${req.headers.host || 'localhost'}</p>
+          <p>If you receive this email, the email service is working! 🎉</p>
+        </div>
+      `
+    });
+    
+    console.log('✅ Test email sent successfully:', testResult);
+    res.status(200).json({ 
+      message: 'Test email sent successfully!',
+      emailId: testResult.messageId,
+      sentTo: 'bh.cafe712@gmail.com'
+    });
+  } catch (err) {
+    console.error('❌ Test email failed:', err);
+    res.status(500).json({ 
+      error: 'Test email failed',
+      details: err.message,
+      code: err.code
+    });
+  }
+});
+
 // Send order confirmation email
 app.post('/send-order-email', authenticateJWT, async (req, res) => {
   try {
+    console.log('📧 Starting email sending process...');
+    
     const userId = req.user.userId;
     const { orderId, items, total, address, phone, payment } = req.body;
     
+    console.log('📧 Email request data:', { userId, orderId, itemsCount: items?.length, total, address, phone, payment });
+    
+    // Validate required fields
+    if (!orderId || !items || !Array.isArray(items) || items.length === 0) {
+      console.error('❌ Invalid email request data:', { orderId, items });
+      return res.status(400).json({ error: 'Invalid order data for email.' });
+    }
+    
     const user = await Customer.findById(userId);
     if (!user?.email) {
+      console.error('❌ User email not found for userId:', userId);
       return res.status(400).json({ error: 'User email not found.' });
     }
+    
+    console.log('📧 Sending email to:', user.email);
 
     // Create order items HTML
     const itemsHtml = items.map(item => `
       <tr>
         <td style="padding: 8px; border-bottom: 1px solid #e3e8ee;">
-          <img src="http://localhost:3000/${item.image}" alt="${item.name}" style="width: 40px; height: 30px; object-fit: cover; border-radius: 4px; margin-right: 8px;">
           ${item.name}
         </td>
         <td style="padding: 8px; border-bottom: 1px solid #e3e8ee; text-align: center;">${item.quantity}</td>
@@ -1297,7 +1367,15 @@ app.post('/send-order-email', authenticateJWT, async (req, res) => {
       paymentMethod = 'UPI Payment';
     }
 
-    await transporter.sendMail({
+    // Verify transporter is configured
+    if (!transporter) {
+      console.error('❌ Email transporter not configured');
+      return res.status(500).json({ error: 'Email service not configured.' });
+    }
+
+    console.log('📧 Sending email via transporter...');
+    
+    const emailResult = await transporter.sendMail({
       from: 'bh.cafe712@gmail.com',
       to: user.email,
       subject: `Brew Haven - Order Confirmation #${orderId.slice(-6).toUpperCase()}`,
@@ -1305,7 +1383,6 @@ app.post('/send-order-email', authenticateJWT, async (req, res) => {
         <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f7fafc; padding: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(59,47,47,0.08);">
           <!-- Header -->
           <div style="background: #2d3748; padding: 32px 0 18px 0; text-align: center;">
-            <img src="https://i.ibb.co/6b7n6Qw/Cafe-logo.png" alt="Brew Haven Logo" style="height: 60px; margin-bottom: 8px;" />
             <h1 style="color: #fff; margin: 0; font-size: 2.1em; letter-spacing: 2px; font-weight: 700;">Brew Haven</h1>
             <p style="color: #c3dafe; margin: 0; font-size: 1.1em;">Order Confirmation</p>
           </div>
@@ -1369,10 +1446,10 @@ app.post('/send-order-email', authenticateJWT, async (req, res) => {
             <div style="font-size: 1.1em; font-weight: 600; letter-spacing: 1px;">Brew Haven</div>
             <div style="margin-top: 8px;">
               <a href="https://instagram.com/" style="display: inline-block; margin: 0 8px; color: #fff; text-decoration: none;">
-                <img src="https://cdn-icons-png.flaticon.com/24/2111/2111463.png" alt="Instagram" style="vertical-align: middle; height: 24px;" />
+                Instagram
               </a>
               <a href="https://facebook.com/" style="display: inline-block; margin: 0 8px; color: #fff; text-decoration: none;">
-                <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="vertical-align: middle; height: 24px;" />
+                Facebook
               </a>
             </div>
             <div style="margin-top: 8px; font-size: 13px; color: #c3dafe;">&copy; ${new Date().getFullYear()} Brew Haven. All rights reserved.</div>
@@ -1381,10 +1458,31 @@ app.post('/send-order-email', authenticateJWT, async (req, res) => {
       `
     });
 
-    res.status(200).json({ message: 'Order confirmation email sent successfully!' });
+    console.log('✅ Email sent successfully to:', user.email);
+    console.log('📧 Email result:', emailResult);
+
+    res.status(200).json({ 
+      message: 'Order confirmation email sent successfully!',
+      emailId: emailResult.messageId,
+      sentTo: user.email
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to send order confirmation email.' });
+    console.error('❌ Email sending failed:', err);
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to send order confirmation email.';
+    if (err.code === 'EAUTH') {
+      errorMessage = 'Email authentication failed. Please check email credentials.';
+    } else if (err.code === 'ECONNECTION') {
+      errorMessage = 'Email service connection failed. Please try again later.';
+    } else if (err.code === 'ETIMEDOUT') {
+      errorMessage = 'Email service timeout. Please try again later.';
+    }
+    
+    res.status(500).json({ 
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
 });
 
@@ -1610,6 +1708,8 @@ app.use((req, res) => {
 });
 
 // ✅ Start Server
-app.listen(3001,'0.0.0.0',() => {
-  console.log("🚀 Server running on http://localhost:3001");
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });

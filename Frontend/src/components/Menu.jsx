@@ -938,9 +938,9 @@ const Menu = () => {
     modalContent: {
       backgroundColor: '#fff',
       borderRadius: '20px',
-      maxWidth: '600px',
+      maxWidth: '800px',
       width: '100%',
-      maxHeight: '90vh',
+      maxHeight: '95vh',
       overflow: 'auto',
       boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
       animation: 'slideIn 0.3s ease-out',
@@ -975,7 +975,7 @@ const Menu = () => {
     },
     modalImage: {
       width: '100%',
-      height: '300px',
+      height: '400px',
       objectFit: 'cover',
       transition: 'transform 0.3s ease',
       '&:hover': {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import 'bootstrap/dist/css/bootstrap.min.css' // Import Bootstrap CSS
+// Bootstrap CSS removed - not using Bootstrap components
 import Signup from './components/Signup.jsx';
 import Signin from './components/SignIn.jsx';  
 import Home from './components/Home.jsx'; 

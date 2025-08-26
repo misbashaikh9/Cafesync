@@ -338,7 +338,7 @@ const Checkout = () => {
 
           // Send order confirmation email
           try {
-            await fetch('http://localhost:3001/send-order-email', {
+            const emailResponse = await fetch('http://localhost:3001/send-order-email', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -363,8 +363,18 @@ const Checkout = () => {
                 payment: paymentForSuccess
               })
             });
+            
+            if (emailResponse.ok) {
+              const emailData = await emailResponse.json();
+              console.log('✅ Order confirmation email sent successfully:', emailData);
+            } else {
+              const emailError = await emailResponse.json();
+              console.error('❌ Order confirmation email failed:', emailError);
+              // Don't block the user flow, but log the error
+            }
           } catch (emailErr) {
-            console.error('Order confirmation email failed:', emailErr);
+            console.error('❌ Order confirmation email request failed:', emailErr);
+            // Don't block the user flow, but log the error
           }
 
           // Clear cart and navigate to success
@@ -495,7 +505,7 @@ const Checkout = () => {
         
         // Send order confirmation email
         try {
-          await fetch('http://localhost:3001/send-order-email', {
+          const emailResponse = await fetch('http://localhost:3001/send-order-email', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -520,9 +530,18 @@ const Checkout = () => {
               payment: paymentForSuccess // Use the properly formatted payment data
             })
           });
+          
+          if (emailResponse.ok) {
+            const emailData = await emailResponse.json();
+            console.log('✅ Order confirmation email sent successfully:', emailData);
+          } else {
+            const emailError = await emailResponse.json();
+            console.error('❌ Order confirmation email failed:', emailError);
+            // Don't block the user flow, but log the error
+          }
         } catch (emailErr) {
           // Optionally log or show a message, but don't block the user
-          console.error('Order confirmation email failed:', emailErr);
+          console.error('❌ Order confirmation email request failed:', emailErr);
         }
 
         // Clear cart and navigate to success
@@ -616,8 +635,43 @@ const Checkout = () => {
     else setCardNumberError('');
   };
   const validateExpiryDate = (value) => {
-    if (!/^\d{2}\/\d{2}$/.test(value)) setExpiryDateError('Expiry must be MM/YY.');
-    else setExpiryDateError('');
+    if (!value.trim()) {
+      setExpiryDateError('Expiry date is required.');
+      return;
+    }
+    
+    if (!/^\d{2}\/\d{2}$/.test(value)) {
+      setExpiryDateError('Format must be MM/YY (e.g., 12/25)');
+      return;
+    }
+    
+    const [month, year] = value.split('/');
+    const monthNum = parseInt(month);
+    const yearNum = parseInt(year);
+    
+    // Validate month range (01-12)
+    if (monthNum < 1 || monthNum > 12) {
+      setExpiryDateError('Month must be between 01-12');
+      return;
+    }
+    
+    // Validate year (current year to current year + 10)
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear() % 100;
+    const maxYear = currentYear + 10;
+    
+    if (yearNum < currentYear || yearNum > maxYear) {
+      setExpiryDateError(`Year must be between ${currentYear}-${maxYear}`);
+      return;
+    }
+    
+    // Check if card is expired
+    if (yearNum < currentYear || (yearNum === currentYear && monthNum < (currentDate.getMonth() + 1))) {
+      setExpiryDateError('Card has expired. Please use a valid card.');
+      return;
+    }
+    
+    setExpiryDateError('');
   };
   const validateCvv = (value) => {
     if (!/^\d{3,4}$/.test(value)) setCvvError('CVV must be 3-4 digits.');
@@ -962,15 +1016,32 @@ const Checkout = () => {
                 />
                 {cardNumberError && <div style={{ color: 'red', marginTop: -14, marginBottom: 12 }}>{cardNumberError}</div>}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <input
-                    type="text"
-                    placeholder="MM/YY"
-                    value={expiryDate}
-                    onChange={e => { setExpiryDate(formatExpiryDate(e.target.value)); validateExpiryDate(formatExpiryDate(e.target.value)); }}
-                    onBlur={e => validateExpiryDate(e.target.value)}
-                    maxLength="5"
-                    style={themeInputStyle}
-                  />
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="MM/YY"
+                      value={expiryDate}
+                      onChange={e => { setExpiryDate(formatExpiryDate(e.target.value)); validateExpiryDate(formatExpiryDate(e.target.value)); }}
+                      onBlur={e => validateExpiryDate(e.target.value)}
+                      maxLength="5"
+                      style={{
+                        ...themeInputStyle,
+                        border: expiryDateError ? '1px solid #f44336' : '1px solid #b8860b',
+                        backgroundColor: expiryDateError ? '#fff5f5' : '#fffaf5'
+                      }}
+                    />
+                    {expiryDateError && <div style={{ color: '#f44336', fontSize: '0.85em', marginTop: 4, marginBottom: 8 }}>{expiryDateError}</div>}
+                    {!expiryDateError && expiryDate && (
+                      <div style={{ color: '#4caf50', fontSize: '0.85em', marginTop: 4, marginBottom: 8 }}>
+                        ✓ Valid expiry date
+                      </div>
+                    )}
+                    {!expiryDate && (
+                      <div style={{ color: '#666', fontSize: '0.8em', marginTop: 4, marginBottom: 8 }}>
+                        Format: MM/YY (e.g., 12/25)
+                      </div>
+                    )}
+                  </div>
                   <input
                     type="text"
                     placeholder="CVV"
