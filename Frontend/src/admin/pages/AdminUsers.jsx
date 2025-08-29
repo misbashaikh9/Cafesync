@@ -15,15 +15,7 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
-      if (!token) {
-        navigate('/admin/login');
-        return;
-      }
-
-      const response = await fetch('http://localhost:3001/admin/users', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await fetch('http://localhost:3001/admin/users');
 
       if (response.ok) {
         const data = await response.json();
@@ -37,9 +29,8 @@ const AdminUsers = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
-    navigate('/admin/login');
+    // Logout functionality removed - admin is now public
+    console.log('Logout clicked');
   };
 
   const filteredUsers = users.filter(user => 

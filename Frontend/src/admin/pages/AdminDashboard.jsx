@@ -20,16 +20,8 @@ const AdminDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
-      if (!token) {
-        navigate('/admin/login');
-        return;
-      }
-
       // Fetch dashboard statistics
-      const statsResponse = await fetch('http://localhost:3001/admin/stats', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const statsResponse = await fetch('http://localhost:3001/admin/stats');
 
       if (statsResponse.ok) {
         const statsData = await statsResponse.json();
@@ -37,9 +29,7 @@ const AdminDashboard = () => {
       }
 
       // Fetch recent orders
-      const ordersResponse = await fetch('http://localhost:3001/admin/recent-orders', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const ordersResponse = await fetch('http://localhost:3001/admin/recent-orders');
 
       if (ordersResponse.ok) {
         const ordersData = await ordersResponse.json();
@@ -53,9 +43,8 @@ const AdminDashboard = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
-    navigate('/admin/login');
+    // Logout functionality removed - admin is now public
+    console.log('Logout clicked');
   };
 
   const styles = {

@@ -18,15 +18,7 @@ const AdminOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
-      if (!token) {
-        navigate('/admin/login');
-        return;
-      }
-
-      const response = await fetch('http://localhost:3001/admin/orders', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await fetch('http://localhost:3001/admin/orders');
 
       if (response.ok) {
         const data = await response.json();
@@ -40,18 +32,15 @@ const AdminOrders = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
-    navigate('/admin/login');
+    // Logout functionality removed - admin is now public
+    console.log('Logout clicked');
   };
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      const token = localStorage.getItem('adminToken');
       const response = await fetch(`http://localhost:3001/admin/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ status: newStatus })

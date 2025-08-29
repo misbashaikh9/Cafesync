@@ -40,9 +40,8 @@ const AdminSettings = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
-    navigate('/admin/login');
+    // Logout functionality removed - admin is now public
+    console.log('Logout clicked');
   };
 
   const styles = {

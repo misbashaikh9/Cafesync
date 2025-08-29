@@ -23,5 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 
-# Admin folder (sensitive information)
-src/admin/
+# Admin folder protection removed - now public

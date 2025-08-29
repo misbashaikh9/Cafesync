@@ -26,15 +26,7 @@ const AdminProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
-      if (!token) {
-        navigate('/admin/login');
-        return;
-      }
-
-      const response = await fetch('http://localhost:3001/admin/products', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await fetch('http://localhost:3001/admin/products');
 
       if (response.ok) {
         const data = await response.json();
@@ -48,19 +40,16 @@ const AdminProducts = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
-    navigate('/admin/login');
+    // Logout functionality removed - admin is now public
+    console.log('Logout clicked');
   };
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('adminToken');
       const response = await fetch('http://localhost:3001/admin/products', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
@@ -86,11 +75,9 @@ const AdminProducts = () => {
   const handleEditProduct = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('adminToken');
       const response = await fetch(`http://localhost:3001/admin/products/${editingProduct._id}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
@@ -116,10 +103,8 @@ const AdminProducts = () => {
   const handleDeleteProduct = async (productId) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        const token = localStorage.getItem('adminToken');
         const response = await fetch(`http://localhost:3001/admin/products/${productId}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${token}` }
+          method: 'DELETE'
         });
 
         if (response.ok) {

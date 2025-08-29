@@ -23,16 +23,8 @@ const AdminAnalytics = () => {
 
   const fetchAnalytics = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
-      if (!token) {
-        navigate('/admin/login');
-        return;
-      }
-
       // For now, we'll use the existing stats endpoint
-      const response = await fetch('http://localhost:3001/admin/stats', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await fetch('http://localhost:3001/admin/stats');
 
       if (response.ok) {
         const data = await response.json();
@@ -55,9 +47,8 @@ const AdminAnalytics = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
-    navigate('/admin/login');
+    // Logout functionality removed - admin is now public
+    console.log('Logout clicked');
   };
 
   const styles = {
