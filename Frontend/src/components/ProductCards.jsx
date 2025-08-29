@@ -288,7 +288,7 @@ const ProductCards = ({ products = [], onAddToCart, showcase = null }) => {
                   <span style={styles.badge}>{product.badge}</span>
                 )}
                 <img 
-                  src={product.image ? `http://localhost:3001/images/${product.image}` : '/menu-images/default-avatar.svg'} 
+                  src={product.image ? `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/images/${product.image}` : '/menu-images/default-avatar.svg'} 
                   alt={product.name} 
                   style={{
                     ...styles.cardImage,

@@ -242,7 +242,7 @@ const OrderHistory = () => {
                 {/* Show first product image as order thumbnail */}
                 {order.items && order.items.length > 0 && (
                   <img
-                    src={`http://localhost:3001/images/${order.items[0].image}`}
+                    src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/images/${order.items[0].image}`}
                     alt={order.items[0].name}
                     style={{ width: 54, height: 40, objectFit: 'cover', borderRadius: 8, boxShadow: '0 1px 4px rgba(59,47,47,0.10)' }}
                   />
@@ -340,7 +340,7 @@ const OrderHistory = () => {
                               <tr key={item.productId}>
                                 <td style={{ padding: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
                                   <img
-                                    src={`http://localhost:3001/images/${item.image}`}
+                                    src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/images/${item.image}`}
                                     alt={item.name}
                                     style={{ width: 36, height: 28, objectFit: 'cover', borderRadius: 4, marginRight: 6 }}
                                   />
@@ -375,7 +375,7 @@ const OrderHistory = () => {
                             }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                                 <img
-                                  src={`http://localhost:3001/images/${item.image}`}
+                                  src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/images/${item.image}`}
                                   alt={item.name}
                                   style={{ width: 32, height: 24, objectFit: 'cover', borderRadius: 4 }}
                                 />

@@ -707,7 +707,7 @@ const Checkout = () => {
         <h2 style={{ color: '#3b2f2f', fontWeight: 600, marginBottom: 18, fontSize: '1.3em' }}>Order Summary</h2>
         {cart.map(item => (
           <div key={item._id} style={{ display: 'flex', alignItems: 'center', marginBottom: 16, background: '#fff', borderRadius: 10, boxShadow: '0 1px 4px rgba(59,47,47,0.06)', padding: 10, flexWrap: 'wrap' }}>
-            <img src={`http://localhost:3001/images/${item.image}`} alt={item.name} style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 6, marginRight: 14 }} />
+                            <img src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/images/${item.image}`} alt={item.name} style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 6, marginRight: 14 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontWeight: 600 }}>{item.name}</div>
               <div style={{ color: '#b8860b' }}>₹{Number(item.price) || 0} x {Number(item.quantity) || 0}</div>

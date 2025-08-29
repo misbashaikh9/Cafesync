@@ -1416,7 +1416,7 @@ const Menu = () => {
         <span style={styles.productBadge}>{product.badge}</span>
       )}
       <img 
-        src={`http://localhost:3001/images/${product.image}`}
+                        src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/images/${product.image}`}
         alt={product.name}
         style={styles.productImage}
         onError={(e) => {
@@ -1532,7 +1532,7 @@ const Menu = () => {
           </button>
           <div style={styles.modalBody}>
             <img 
-              src={`http://localhost:3001/images/${modalProduct.image}`}
+              src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/images/${modalProduct.image}`}
               alt={modalProduct.name}
               style={styles.modalImage}
               onError={(e) => {
@@ -1896,7 +1896,7 @@ const Menu = () => {
                         }}
                       >
                         <img
-                          src={`http://localhost:3001/images/${product.image}`}
+                          src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/images/${product.image}`}
                           alt={product.name}
                           style={{
                             width: '100%',

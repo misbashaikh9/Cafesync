@@ -56,7 +56,7 @@ const Receipt = ({ order, payment, discounts = [], emailSent = false, estDeliver
                 borderBottom: '1px solid #f0f0f0'
               }}>
                 <img 
-                  src={`http://localhost:3001/images/${item.image}`} 
+                  src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/images/${item.image}`} 
                   alt={item.name} 
                   style={{ width: 48, height: 32, objectFit: 'cover', borderRadius: 6, marginRight: 12 }} 
                 />

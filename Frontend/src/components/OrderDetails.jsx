@@ -56,7 +56,7 @@ const OrderDetails = () => {
               <>
                 {items.map(item => (
                   <div key={item.productId} style={{ display: 'flex', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
-                    <img src={`http://localhost:3001/images/${item.image}`} alt={item.name} style={{ width: 48, height: 32, objectFit: 'cover', borderRadius: 6, marginRight: 12 }} />
+                    <img src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/images/${item.image}`} alt={item.name} style={{ width: 48, height: 32, objectFit: 'cover', borderRadius: 6, marginRight: 12 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>{item.name} x {item.quantity}</div>
                     <div style={{ fontWeight: 600, color: '#b8860b' }}>₹{item.price * item.quantity}</div>
                   </div>
