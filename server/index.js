@@ -441,23 +441,10 @@ app.delete('/wishlist/clear', authenticateJWT, async (req, res) => {
   }
 });
 
-// 🛒 Get current user's cart
-app.get('/cart', authenticateJWT, async (req, res) => {
-  try {
-    const userId = req.user.userId;
-    let cart = await cartModel.findOne({ userId }).populate('items.productId');
-    if (!cart) {
-      cart = await cartModel.create({ userId, items: [] });
-    }
-    res.status(200).json(cart);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch cart' });
-  }
-});
+// 🛒 Get current user's cart (removed duplicate - keeping the one at line 1684)
 
-// 🛒 Update current user's cart
-app.post('/cart', authenticateJWT, async (req, res) => {
+// 🛒 Bulk update current user's cart (for bulk operations)
+app.post('/cart/bulk', authenticateJWT, async (req, res) => {
   try {
     const userId = req.user.userId;
     const { items } = req.body; // [{ productId, quantity }]
@@ -1677,6 +1664,162 @@ app.get('/admin/orders', authenticateAdmin, async (req, res) => {
   } catch (error) {
     console.error('Error fetching orders:', error);
     res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
+
+// 🛒 Cart Endpoints
+// Get user's cart
+app.get('/cart', authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    let cart = await cartModel.findOne({ userId }).populate('items.productId');
+    
+    if (!cart) {
+      // Create empty cart if none exists
+      cart = await cartModel.create({ userId, items: [] });
+    }
+    
+    res.json({ items: cart.items });
+  } catch (error) {
+    console.error('Error fetching cart:', error);
+    res.status(500).json({ error: 'Failed to fetch cart' });
+  }
+});
+
+// Add item to cart
+app.post('/cart', authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { productId, quantity = 1 } = req.body;
+    
+    if (!productId) {
+      return res.status(400).json({ error: 'Product ID is required' });
+    }
+    
+    let cart = await cartModel.findOne({ userId });
+    
+    if (!cart) {
+      // Create new cart if none exists
+      cart = new cartModel({ userId, items: [] });
+    }
+    
+    // Check if product already exists in cart
+    const existingItem = cart.items.find(item => item.productId.toString() === productId);
+    
+    if (existingItem) {
+      // Update quantity if product already exists
+      existingItem.quantity += quantity;
+    } else {
+      // Add new product to cart
+      cart.items.push({ productId, quantity });
+    }
+    
+    cart.updatedAt = new Date();
+    await cart.save();
+    
+    // Populate product details for response
+    await cart.populate('items.productId');
+    
+    res.json({ 
+      message: 'Item added to cart successfully',
+      cart: cart.items 
+    });
+  } catch (error) {
+    console.error('Error adding item to cart:', error);
+    res.status(500).json({ error: 'Failed to add item to cart' });
+  }
+});
+
+// Update cart item quantity
+app.put('/cart/:productId', authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { productId } = req.params;
+    const { quantity } = req.body;
+    
+    if (quantity <= 0) {
+      return res.status(400).json({ error: 'Quantity must be greater than 0' });
+    }
+    
+    const cart = await cartModel.findOne({ userId });
+    
+    if (!cart) {
+      return res.status(404).json({ error: 'Cart not found' });
+    }
+    
+    const item = cart.items.find(item => item.productId.toString() === productId);
+    
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found in cart' });
+    }
+    
+    item.quantity = quantity;
+    cart.updatedAt = new Date();
+    await cart.save();
+    
+    await cart.populate('items.productId');
+    
+    res.json({ 
+      message: 'Cart updated successfully',
+      cart: cart.items 
+    });
+  } catch (error) {
+    console.error('Error updating cart:', error);
+    res.status(500).json({ error: 'Failed to update cart' });
+  }
+});
+
+// Remove item from cart
+app.delete('/cart/:productId', authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { productId } = req.params;
+    
+    const cart = await cartModel.findOne({ userId });
+    
+    if (!cart) {
+      return res.status(404).json({ error: 'Cart not found' });
+    }
+    
+    // Remove item from cart
+    cart.items = cart.items.filter(item => item.productId.toString() !== productId);
+    cart.updatedAt = new Date();
+    await cart.save();
+    
+    await cart.populate('items.productId');
+    
+    res.json({ 
+      message: 'Item removed from cart successfully',
+      cart: cart.items 
+    });
+  } catch (error) {
+    console.error('Error removing item from cart:', error);
+    res.status(500).json({ error: 'Failed to remove item from cart' });
+  }
+});
+
+// Clear entire cart
+app.delete('/cart', authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    
+    const cart = await cartModel.findOne({ userId });
+    
+    if (!cart) {
+      return res.status(404).json({ error: 'Cart not found' });
+    }
+    
+    cart.items = [];
+    cart.updatedAt = new Date();
+    await cart.save();
+    
+    res.json({ 
+      message: 'Cart cleared successfully',
+      cart: { items: [] }
+    });
+  } catch (error) {
+    console.error('Error clearing cart:', error);
+    res.status(500).json({ error: 'Failed to clear cart' });
   }
 });
 

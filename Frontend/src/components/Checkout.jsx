@@ -378,12 +378,12 @@ const Checkout = () => {
           }
 
           // Clear cart and navigate to success
-          cart.forEach(item => {
+          for (const item of cart) {
             const itemId = item._id || item.id;
             if (itemId) {
-              removeFromCart(itemId);
+              await removeFromCart(itemId);
             }
-          });
+          }
 
           navigate('/order-success', { 
             state: { 
@@ -545,12 +545,12 @@ const Checkout = () => {
         }
 
         // Clear cart and navigate to success
-        cart.forEach(item => {
+        for (const item of cart) {
           const itemId = item._id || item.id;
           if (itemId) {
-            removeFromCart(itemId);
+            await removeFromCart(itemId);
           }
-        });
+        }
         
         // Get order ID from response (handle different response structures)
         const orderId = data.orderId || data.order?._id || data.orderId || data.id;

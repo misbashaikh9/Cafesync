@@ -93,36 +93,6 @@ const Menu = () => {
   const loadWishlist = async (forceRefresh = false) => {
     if (!token) return;
     
-    // Check if we have cached data and it's still valid
-    const now = Date.now();
-    const isCacheValid = wishlistLastFetched && (now - wishlistLastFetched < CACHE_DURATION);
-    
-    if (!forceRefresh && isCacheValid && wishlist.length > 0) {
-      console.log('Using cached wishlist data');
-      return;
-    }
-    
-    // Check localStorage as fallback cache
-    if (!forceRefresh && !isCacheValid) {
-      const cachedWishlist = localStorage.getItem(`wishlist_${token}`);
-      const cachedTimestamp = localStorage.getItem(`wishlist_timestamp_${token}`);
-      
-      if (cachedWishlist && cachedTimestamp) {
-        const cacheAge = now - parseInt(cachedTimestamp);
-        if (cacheAge < CACHE_DURATION) {
-          try {
-            const parsedWishlist = JSON.parse(cachedWishlist);
-            setWishlist(parsedWishlist);
-            setWishlistLastFetched(parseInt(cachedTimestamp));
-            console.log('Using localStorage cached wishlist data');
-            return;
-          } catch (error) {
-            console.error('Error parsing cached wishlist:', error);
-          }
-        }
-      }
-    }
-    
     try {
       setWishlistLoading(true);
       const response = await fetch('http://localhost:3001/wishlist', {
@@ -135,11 +105,7 @@ const Menu = () => {
         const wishlistData = await response.json();
         const wishlistIds = wishlistData.map(item => item.productId._id || item.productId);
         setWishlist(wishlistIds);
-        setWishlistLastFetched(now);
-        
-        // Cache in localStorage as fallback
-        localStorage.setItem(`wishlist_${token}`, JSON.stringify(wishlistIds));
-        localStorage.setItem(`wishlist_timestamp_${token}`, now.toString());
+        setWishlistLastFetched(Date.now());
         
         console.log('Wishlist fetched from database');
       } else {
@@ -220,15 +186,14 @@ const Menu = () => {
       return;
     }
 
+    // Prevent multiple rapid clicks
+    if (wishlistLoading) {
+      return;
+    }
+
     try {
+      setWishlistLoading(true);
       const isCurrentlyInWishlist = wishlist.includes(productId);
-      
-      // Optimistic update - update UI immediately
-      if (isCurrentlyInWishlist) {
-        setWishlist(prev => prev.filter(id => id !== productId));
-      } else {
-        setWishlist(prev => [...prev, productId]);
-      }
       
       if (isCurrentlyInWishlist) {
         // Remove from wishlist
@@ -240,6 +205,11 @@ const Menu = () => {
         });
 
         if (response.ok) {
+          // Update local state after successful removal
+          setWishlist(prev => prev.filter(id => id !== productId));
+          
+                     // Wishlist updated successfully
+          
           Swal.fire({
             toast: true,
             position: 'top-end',
@@ -253,9 +223,6 @@ const Menu = () => {
             iconColor: '#b8860b',
           });
         } else {
-          // Revert optimistic update on error
-          setWishlist(prev => [...prev, productId]);
-          
           // Get more specific error information
           let errorMessage = 'Failed to remove from wishlist';
           try {
@@ -287,6 +254,11 @@ const Menu = () => {
         });
 
         if (response.ok) {
+          // Update local state after successful addition
+          setWishlist(prev => [...prev, productId]);
+          
+                     // Wishlist updated successfully
+          
           Swal.fire({
             toast: true,
             position: 'top-end',
@@ -300,10 +272,22 @@ const Menu = () => {
             iconColor: '#b8860b',
           });
         } else {
-          // Revert optimistic update on error
-          setWishlist(prev => prev.filter(id => id !== productId));
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to add to wishlist');
+          // Handle specific error cases
+          if (response.status === 409) {
+            // Product already in wishlist - refresh the wishlist data
+            await loadWishlist(true); // Force refresh
+            Swal.fire({
+              icon: 'info',
+              title: 'Already in Wishlist',
+              text: 'This product is already in your wishlist!',
+              background: '#fffbe6',
+              color: '#3b2f2f',
+              iconColor: '#b8860b',
+            });
+          } else {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to add to wishlist');
+          }
         }
       }
     } catch (error) {
@@ -316,6 +300,8 @@ const Menu = () => {
         color: '#3b2f2f',
         iconColor: '#b8860b',
       });
+    } finally {
+      setWishlistLoading(false);
     }
   };
 
@@ -370,9 +356,9 @@ const Menu = () => {
     }
 
     // Add all products to cart
-    wishlistProducts.forEach(product => {
-      addToCart(product);
-    });
+    for (const product of wishlistProducts) {
+      await addToCart(product);
+    }
 
     // Clear wishlist using individual delete method (more reliable)
     try {
@@ -402,9 +388,6 @@ const Menu = () => {
       
       // Clear wishlist from local state
       setWishlist([]);
-      // Clear localStorage cache
-      localStorage.removeItem(`wishlist_${token}`);
-      localStorage.removeItem(`wishlist_timestamp_${token}`);
       
       Swal.fire({
         toast: true,
@@ -425,8 +408,6 @@ const Menu = () => {
       
       // Still clear locally on any error
       setWishlist([]);
-      localStorage.removeItem(`wishlist_${token}`);
-      localStorage.removeItem(`wishlist_timestamp_${token}`);
       
       Swal.fire({
         toast: true,
@@ -1492,9 +1473,13 @@ const Menu = () => {
               e.target.style.transform = 'translateY(0)';
               e.target.style.boxShadow = '0 4px 16px rgba(184, 134, 11, 0.2)';
             }}
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
-              addToCart(product);
+              console.log('🛒 [Menu] Product being added to cart:', product);
+              console.log('🛒 [Menu] Product ID:', product._id);
+              console.log('🛒 [Menu] Product name:', product.name);
+              console.log('🛒 [Menu] Product keys:', Object.keys(product));
+              await addToCart(product);
               Swal.fire({
                 toast: true,
                 position: 'top-end',
@@ -1994,10 +1979,10 @@ const Menu = () => {
                     e.target.style.transform = 'translateY(0)';
                     e.target.style.boxShadow = '0 4px 16px rgba(184, 134, 11, 0.2)';
                   }}
-                  onClick={() => {
+                  onClick={async () => {
                     // Add the product with the selected quantity
                     for (let i = 0; i < modalQuantity; i++) {
-                      addToCart(modalProduct);
+                      await addToCart(modalProduct);
                     }
                     setModalProduct(null);
                     setModalQuantity(1);

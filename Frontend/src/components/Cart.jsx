@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from './Header.jsx';
 
 const Cart = () => {
-  const { cart, updateQuantity, removeFromCart, clearCart } = useCart();
+  const { cart, cartLoading, updateQuantity, removeFromCart, clearCart, refreshCart } = useCart();
   const total = cart.reduce((sum, item) => {
     const price = Number(item.price) || 0;
     const quantity = Number(item.quantity) || 0;
@@ -12,23 +12,42 @@ const Cart = () => {
   }, 0);
   const navigate = useNavigate();
 
+  // Log cart data for debugging
+  console.log('[Cart Component] Cart data:', cart);
+  console.log('[Cart Component] Cart loading:', cartLoading);
+  console.log('[Cart Component] Total items:', cart.reduce((sum, item) => sum + item.quantity, 0));
+  console.log('[Cart Component] Total price:', total);
+
   return (
     <>
       <Header />
       <section style={{ backgroundColor: '#faf8f3', minHeight: '100vh' }}>
         <div className="menu-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 24px' }}>
           <h1 className="menu-title">Your Cart</h1>
+          <p style={{ 
+            textAlign: 'center', 
+            color: '#b8860b', 
+            fontSize: '0.9em', 
+            marginTop: '-20px', 
+            marginBottom: '20px',
+            fontStyle: 'italic'
+          }}>
+            d ut
+          </p>
           
 
           
-          {cart.length > 0 && (
+          <div style={{ 
+            position: 'absolute', 
+            top: '2rem', 
+            right: '2rem',
+            display: 'flex',
+            gap: '12px'
+          }}>
             <button 
-              onClick={clearCart}
+              onClick={async () => await refreshCart()}
               style={{ 
-                position: 'absolute', 
-                top: '2rem', 
-                right: '2rem',
-                background: 'linear-gradient(90deg, #bfa77a 0%, #a88c5f 100%)',
+                background: 'linear-gradient(90deg, #4CAF50 0%, #45a049 100%)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '999px',
@@ -36,24 +55,58 @@ const Cart = () => {
                 cursor: 'pointer',
                 fontSize: '14px',
                 fontWeight: '600',
-                boxShadow: '0 2px 8px rgba(191, 167, 122, 0.13)',
+                boxShadow: '0 2px 8px rgba(76, 175, 80, 0.13)',
                 transition: 'all 0.18s ease'
               }}
               onMouseEnter={(e) => {
-                e.target.style.background = 'linear-gradient(90deg, #a88c5f 0%, #bfa77a 100%)';
+                e.target.style.background = 'linear-gradient(90deg, #45a049 0%, #4CAF50 100%)';
                 e.target.style.transform = 'translateY(-2px) scale(1.04)';
-                e.target.style.boxShadow = '0 6px 18px rgba(191, 167, 122, 0.18)';
+                e.target.style.boxShadow = '0 6px 18px rgba(76, 175, 80, 0.18)';
               }}
               onMouseLeave={(e) => {
-                e.target.style.background = 'linear-gradient(90deg, #bfa77a 0%, #a88c5f 100%)';
+                e.target.style.background = 'linear-gradient(90deg, #4CAF50 0%, #45a049 100%)';
                 e.target.style.transform = 'translateY(0) scale(1)';
-                e.target.style.boxShadow = '0 2px 8px rgba(191, 167, 122, 0.13)';
+                e.target.style.boxShadow = '0 2px 8px rgba(76, 175, 80, 0.13)';
               }}
             >
-              🗑️ Clear Cart
+              🔄 Refresh
             </button>
-          )}
-          {cart.length === 0 ? (
+            {cart.length > 0 && (
+              <button 
+                onClick={async () => await clearCart()}
+                style={{ 
+                  background: 'linear-gradient(90deg, #bfa77a 0%, #a88c5f 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '999px',
+                  padding: '8px 16px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  boxShadow: '0 2px 8px rgba(191, 167, 122, 0.13)',
+                  transition: 'all 0.18s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'linear-gradient(90deg, #a88c5f 0%, #bfa77a 100%)';
+                  e.target.style.transform = 'translateY(-2px) scale(1.04)';
+                  e.target.style.boxShadow = '0 6px 18px rgba(191, 167, 122, 0.18)';
+              }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'linear-gradient(90deg, #bfa77a 0%, #a88c5f 100%)';
+                  e.target.style.transform = 'translateY(0) scale(1)';
+                  e.target.style.boxShadow = '0 2px 8px rgba(191, 167, 122, 0.13)';
+                }}
+              >
+                🗑️ Clear Cart
+              </button>
+            )}
+          </div>
+          {cartLoading ? (
+            <div style={{ textAlign: 'center', padding: '40px' }}>
+              <div style={{ fontSize: '1.2em', color: '#b8860b', marginBottom: '16px' }}>🔄 Loading your cart...</div>
+              <div style={{ color: '#888', fontSize: '1em' }}>Fetching items from backend...</div>
+            </div>
+          ) : cart.length === 0 ? (
             <p style={{ textAlign: 'center', color: '#888', fontSize: '1.2em' }}>Your cart is empty.</p>
           ) : (
             <div style={{ maxWidth: 700, margin: '0 auto' }}>
@@ -84,7 +137,7 @@ const Cart = () => {
                     <h3 style={{ margin: 0, fontSize: '1.1em', color: '#3b2f2f' }}>{item.name}</h3>
                     <div style={{ color: '#b8860b', fontWeight: 600 }}>₹{Number(item.price) || 0}</div>
                     <div style={{ marginTop: 8 }}>
-                      <button onClick={() => updateQuantity(item._id, Math.max(1, item.quantity - 1))} style={{ 
+                      <button onClick={async () => await updateQuantity(item._id, Math.max(1, item.quantity - 1))} style={{ 
                         marginRight: 8, 
                         padding: '2px 10px',
                         backgroundColor: '#d2b262',
@@ -96,7 +149,7 @@ const Cart = () => {
                         transition: 'all 0.3s ease'
                       }}>-</button>
                       <span style={{ fontWeight: 600 }}>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item._id, item.quantity + 1)} style={{ 
+                      <button onClick={async () => await updateQuantity(item._id, item.quantity + 1)} style={{ 
                         marginLeft: 8, 
                         padding: '2px 10px',
                         backgroundColor: '#d2b262',
@@ -107,7 +160,7 @@ const Cart = () => {
                         fontWeight: '600',
                         transition: 'all 0.3s ease'
                       }}>+</button>
-                                          <button onClick={() => removeFromCart(item._id)} style={{ 
+                                          <button onClick={async () => await removeFromCart(item._id)} style={{ 
                       marginLeft: 18, 
                       color: '#fff', 
                       backgroundColor: '#d2b262', 
@@ -156,8 +209,39 @@ const Cart = () => {
                 </button>
               </div>
               
-              <div style={{ textAlign: 'right', fontSize: '1.3em', fontWeight: 700, color: '#b8860b', marginTop: 24 }}>
-                Total: ₹{total}
+              {/* Cart Summary */}
+              <div style={{ 
+                background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                borderRadius: '16px',
+                padding: '24px',
+                marginTop: '32px',
+                border: '2px solid rgba(184, 134, 11, 0.1)',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+              }}>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  marginBottom: '16px',
+                  paddingBottom: '16px',
+                  borderBottom: '2px solid rgba(184, 134, 11, 0.2)'
+                }}>
+                  <span style={{ fontSize: '1.1em', fontWeight: '600', color: '#6d4c41' }}>
+                    Total Items: {cart.reduce((sum, item) => sum + item.quantity, 0)}
+                  </span>
+                  <span style={{ fontSize: '1.1em', fontWeight: '600', color: '#6d4c41' }}>
+                    Items in Cart: {cart.length}
+                  </span>
+                </div>
+                <div style={{ 
+                  textAlign: 'right', 
+                  fontSize: '1.5em', 
+                  fontWeight: '800', 
+                  color: '#b8860b',
+                  textShadow: '0 2px 4px rgba(184, 134, 11, 0.2)'
+                }}>
+                  Total: ₹{total.toFixed(2)}
+                </div>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 32 }}>
                 <button

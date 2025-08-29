@@ -43,8 +43,13 @@ const Header = () => {
     navigate("/");
   };
 
-  const { cart } = useCart();
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const { cart, cartLoading } = useCart();
+  const cartCount = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  
+  // Log cart count for debugging
+  console.log('[Header] Cart items:', cart);
+  console.log('[Header] Cart count:', cartCount);
+  console.log('[Header] Cart loading:', cartLoading);
 
   const styles = {
     nav: {
@@ -299,9 +304,25 @@ const Header = () => {
               }} />
             </Link>
             <Link to="/cart" style={{ ...styles.link, position: 'relative', fontSize: 22, marginLeft: 8, color: isHomePage ? '#fff' : '#6d4c41' }}>
-              🛒
+              {cartLoading ? '⏳' : '🛒'}
               {cartCount > 0 && (
-                <span style={{ position: 'absolute', top: -8, right: -12, background: '#ff5858', color: '#fff', borderRadius: '50%', fontSize: 13, width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>{cartCount}</span>
+                <span style={{ 
+                  position: 'absolute', 
+                  top: -8, 
+                  right: -12, 
+                  background: cartLoading ? '#ffa726' : '#ff5858', 
+                  color: '#fff', 
+                  borderRadius: '50%', 
+                  fontSize: 13, 
+                  width: 20, 
+                  height: 20, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  fontWeight: 700 
+                }}>
+                  {cartLoading ? '...' : cartCount}
+                </span>
               )}
             </Link>
             {renderAuth()}

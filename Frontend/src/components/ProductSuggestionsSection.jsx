@@ -6,7 +6,7 @@ import { useAuth } from './AuthContext.jsx';
 const ProductSuggestionsSection = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('wishlist');
   const [recommendations, setRecommendations] = useState({
@@ -19,9 +19,8 @@ const ProductSuggestionsSection = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Extract userId from JWT token since useAuth is not working
-  const token = localStorage.getItem('token');
-  const userId = token ? JSON.parse(atob(token.split('.')[1]))?.userId : null;
+  // Get user info from useAuth
+  const userId = user?.userId || user?._id;
 
   // Debug user authentication state
   useEffect(() => {
@@ -29,13 +28,12 @@ const ProductSuggestionsSection = () => {
     console.log('User ID from useAuth:', user?.userId || user?._id);
     console.log('User ID from token:', userId);
     console.log('User email:', user?.email);
-    console.log('Local storage token:', token);
-  }, [user, userId, token]);
+  }, [user, userId]);
 
   // Fetch wishlist products from database
   const fetchWishlist = async () => {
-    if (!userId) {
-      console.log('No user ID found, returning empty wishlist');
+    if (!userId || !token) {
+      console.log('No user ID or token found, returning empty wishlist');
       return [];
     }
     
@@ -97,6 +95,11 @@ const ProductSuggestionsSection = () => {
 
   // Remove item from wishlist
   const removeFromWishlist = async (productId) => {
+    if (!token) {
+      console.log('No token available for wishlist removal');
+      return;
+    }
+    
     try {
       const response = await fetch(`http://localhost:3001/wishlist/${productId}`, {
         method: 'DELETE',
@@ -202,8 +205,11 @@ const ProductSuggestionsSection = () => {
       }
     };
 
-    fetchRecommendations();
-  }, [user, userId, token]);
+    // Only fetch if we have a userId and haven't fetched yet
+    if (userId && !loading) {
+      fetchRecommendations();
+    }
+  }, [userId]); // Remove user and token from dependencies to prevent duplicate calls
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -225,8 +231,8 @@ const ProductSuggestionsSection = () => {
     };
   }, []);
 
-  const handleAddToCart = (product) => {
-    addToCart({
+  const handleAddToCart = async (product) => {
+    await addToCart({
       ...product,
       quantity: 1
     });
@@ -637,7 +643,7 @@ const ProductSuggestionsSection = () => {
                 <div style={styles.actionButtons}>
                   <button
                     style={styles.addToCartBtn}
-                    onClick={() => handleAddToCart(product)}
+                    onClick={async () => await handleAddToCart(product)}
                     onMouseEnter={(e) => {
                       e.target.style.backgroundColor = '#c19a4a';
                       e.target.style.transform = 'translateY(-2px)';
