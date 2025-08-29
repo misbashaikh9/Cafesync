@@ -16,11 +16,11 @@ build/
 .env.production.local
 *.env
 
-# Admin and sensitive folders
-**/admin/
-**/admin/**
-Frontend/src/admin/
-server/admin/
+# Admin and sensitive folders (commented out for Vercel deployment)
+# **/admin/
+# **/admin/**
+# Frontend/src/admin/
+# server/admin/
 
 # Configuration files with sensitive data
 **/config/
