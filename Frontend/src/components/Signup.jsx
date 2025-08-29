@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import axios from 'axios';
-import eyeIcon from "/menu-images/eye-close.png";
-import eyeOffIcon from "/menu-images/eye-open.png";
+// Import images from public folder
+const eyeIcon = "/menu-images/eye-close.png";
+const eyeOffIcon = "/menu-images/eye-open.png";
 
 const Signup = () => {
   const navigate = useNavigate();
