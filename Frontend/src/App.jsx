@@ -16,13 +16,13 @@ import About from './components/About.jsx';
 import OrderDetails from './components/OrderDetails.jsx';
 
 // Admin components
-import AdminLogin from './admin/pages/AdminLogin.jsx';
-import AdminDashboard from './admin/pages/AdminDashboard.jsx';
-import AdminProducts from './admin/pages/AdminProducts.jsx';
-import AdminOrders from './admin/pages/AdminOrders.jsx';
-import AdminUsers from './admin/pages/AdminUsers.jsx';
-import AdminAnalytics from './admin/pages/AdminAnalytics.jsx';
-import AdminSettings from './admin/pages/AdminSettings.jsx';
+import AdminLogin from './admin/pages/AdminLogin';
+import AdminDashboard from './admin/pages/AdminDashboard';
+import AdminProducts from './admin/pages/AdminProducts';
+import AdminOrders from './admin/pages/AdminOrders';
+import AdminUsers from './admin/pages/AdminUsers';
+import AdminAnalytics from './admin/pages/AdminAnalytics';
+import AdminSettings from './admin/pages/AdminSettings';
 
 import {BrowserRouter,Routes,Route} from 'react-router-dom'
 import { CartProvider } from './components/CartContext.jsx';

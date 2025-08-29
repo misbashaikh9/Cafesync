@@ -1,0 +1,3 @@
+[33m6d02d39[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Add deployment configuration for Render and Vercel
+[33mb6037fe[m  Prepare for deployment: Clean up unused files, add env variables support, create deployment docs
+[33m919f7ee[m Initial commit: Cafeteria project with clean source code
