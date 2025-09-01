@@ -255,7 +255,7 @@ app.delete('/products/:id/rate', authenticateJWT, async (req, res) => {
 app.get('/wishlist', authenticateJWT, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const wishlist = await Wishlist.find({ userId }).populate('productId');
+    const wishlist = await Wishlistn.find({ userId }).populate('productId');
     res.status(200).json(wishlist);
   } catch (err) {
     console.error(err);

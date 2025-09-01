@@ -26,7 +26,7 @@ const AdminProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:3001/admin/products');
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/admin/products`);
 
       if (response.ok) {
         const data = await response.json();
@@ -47,7 +47,7 @@ const AdminProducts = () => {
   const handleAddProduct = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:3001/admin/products', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/admin/products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -75,7 +75,7 @@ const AdminProducts = () => {
   const handleEditProduct = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:3001/admin/products/${editingProduct._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/admin/products/${editingProduct._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -103,7 +103,7 @@ const AdminProducts = () => {
   const handleDeleteProduct = async (productId) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        const response = await fetch(`http://localhost:3001/admin/products/${productId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/admin/products/${productId}`, {
           method: 'DELETE'
         });
 
