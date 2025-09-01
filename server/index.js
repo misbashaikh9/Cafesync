@@ -78,6 +78,32 @@ app.get('/default-avatar.svg', (req, res) => {
   res.sendFile(path.join(__dirname, 'default-avatar.svg'));
 });
 
+// Add specific image serving route for better compatibility
+app.get('/images/:category/:filename', (req, res) => {
+  const { category, filename } = req.params;
+  const imagePath = path.join(__dirname, 'images', category, filename);
+  
+  // Check if file exists
+  if (fs.existsSync(imagePath)) {
+    res.sendFile(imagePath);
+  } else {
+    res.status(404).json({ error: 'Image not found' });
+  }
+});
+
+// Add API image serving route
+app.get('/api/images/:category/:filename', (req, res) => {
+  const { category, filename } = req.params;
+  const imagePath = path.join(__dirname, 'images', category, filename);
+  
+  // Check if file exists
+  if (fs.existsSync(imagePath)) {
+    res.sendFile(imagePath);
+  } else {
+    res.status(404).json({ error: 'Image not found' });
+  }
+});
+
 // JWT middleware
 function authenticateJWT(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -265,7 +291,7 @@ aapp.get('/wishlist', authenticateJWT, async (req, res) => {
 
 // Add item to wishlist
 app.post('/wishlist', authenticateJWT, async (req, res) => {
-  try {
+  try { 
     const userId = req.user.userId;
     const { productId } = req.body;
 
