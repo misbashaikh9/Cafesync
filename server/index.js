@@ -321,10 +321,10 @@ app.delete('/products/:id/rate', authenticateJWT, async (req, res) => {
 // 💖 WISHLIST ROUTES
 
 // Get user's wishlist
-aapp.get('/wishlist', authenticateJWT, async (req, res) => {
+app.get('/wishlist', authenticateJWT, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const wishlist = await Wishlistns.find({ userId }).populate('productId');
+    const wishlist = await Wishlist.find({ userId }).populate('productId');
     res.status(200).json(wishlist);
   } catch (err) {
     console.error(err);
