@@ -252,7 +252,7 @@ app.delete('/products/:id/rate', authenticateJWT, async (req, res) => {
 // 💖 WISHLIST ROUTES
 
 // Get user's wishlist
-app.get('/wishlist', authenticateJWT, async (req, res) => {
+aapp.get('/wishlist', authenticateJWT, async (req, res) => {
   try {
     const userId = req.user.userId;
     const wishlist = await Wishlistns.find({ userId }).populate('productId');

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from './Header.jsx';
+import CafeHeroImage from '../assets/Cafe_Hero.avif';
 
 const Hero = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -17,7 +18,7 @@ const Hero = () => {
     img.onload = () => setImageLoaded(true);
     // Change this to your new image path (e.g., '/menu-images/Cafe_Hero.jpg' or '/menu-images/Cafe_Hero.webp')
     // For testing, you can use: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1920&h=1080&fit=crop'
-    img.src = '/menu-images/Cafe_Hero.avif'; // ← CHANGE THIS LINE
+    img.src = CafeHeroImage;
 
     // Trigger animation after component mounts
     const timer = setTimeout(() => setIsVisible(true), 100);
@@ -32,7 +33,7 @@ const Hero = () => {
   const styles = {
     hero: {
       backgroundImage: imageLoaded 
-        ? 'url("/menu-images/Cafe_Hero.jpg")' // Your new beautiful coffee image
+        ? `url(${CafeHeroImage})` // Your new beautiful coffee image
         : 'none',
       backgroundSize: 'cover',
       backgroundPosition: 'center',

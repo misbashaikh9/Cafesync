@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CafeInfoImage from '../assets/Cafe_info.jpg';
 
 const InfoSection = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -248,7 +249,7 @@ const InfoSection = () => {
         </div>
         
         <img
-          src="/menu-images/Cafe_info.jpg"
+          src={CafeInfoImage}
           alt="Brew Haven Cafe Atmosphere"
           style={{...styles.infoImage, ...(isMobile && styles.mobileImage)}}
           onMouseEnter={(e) => {
