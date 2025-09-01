@@ -69,6 +69,7 @@ const upload = multer({
 // Serve uploaded files
 app.use('/uploads', express.static('uploads'));
 app.use('/images', express.static('images'));
+app.use('/api/images', express.static('images'));
 
 // Static assets are served by React frontend from public folder
 
