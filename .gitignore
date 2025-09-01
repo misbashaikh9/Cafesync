@@ -135,7 +135,7 @@ checkProducts.js
 # Image uploads and user content
 uploads/
 **/uploads/
-server/images/
+# server/images/  # Commented out to allow product images
 server/uploads/
 
 # Package lock files (optional - uncomment if you want to exclude them)
