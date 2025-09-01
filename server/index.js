@@ -80,27 +80,70 @@ app.get('/default-avatar.svg', (req, res) => {
 
 // Add specific image serving route for better compatibility
 app.get('/images/:category/:filename', (req, res) => {
-  const { category, filename } = req.params;
-  const imagePath = path.join(__dirname, 'images', category, filename);
-  
-  // Check if file exists
-  if (fs.existsSync(imagePath)) {
-    res.sendFile(imagePath);
-  } else {
-    res.status(404).json({ error: 'Image not found' });
+  try {
+    const { category, filename } = req.params;
+    const imagePath = path.join(__dirname, 'images', category, filename);
+    
+    console.log(`🔍 Requesting image: ${imagePath}`);
+    
+    // Check if file exists
+    if (fs.existsSync(imagePath)) {
+      console.log(`✅ Image found: ${imagePath}`);
+      res.sendFile(imagePath);
+    } else {
+      console.log(`❌ Image not found: ${imagePath}`);
+      res.status(404).json({ error: 'Image not found', path: imagePath });
+    }
+  } catch (error) {
+    console.error('Error serving image:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 // Add API image serving route
 app.get('/api/images/:category/:filename', (req, res) => {
-  const { category, filename } = req.params;
-  const imagePath = path.join(__dirname, 'images', category, filename);
-  
-  // Check if file exists
-  if (fs.existsSync(imagePath)) {
-    res.sendFile(imagePath);
-  } else {
-    res.status(404).json({ error: 'Image not found' });
+  try {
+    const { category, filename } = req.params;
+    const imagePath = path.join(__dirname, 'images', category, filename);
+    
+    console.log(`🔍 Requesting API image: ${imagePath}`);
+    
+    // Check if file exists
+    if (fs.existsSync(imagePath)) {
+      console.log(`✅ API Image found: ${imagePath}`);
+      res.sendFile(imagePath);
+    } else {
+      console.log(`❌ API Image not found: ${imagePath}`);
+      res.status(404).json({ error: 'Image not found', path: imagePath });
+    }
+  } catch (error) {
+    console.error('Error serving API image:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add a test route to verify the server is working
+app.get('/test-images', (req, res) => {
+  try {
+    const imagesDir = path.join(__dirname, 'images');
+    const categories = fs.readdirSync(imagesDir);
+    const imageList = {};
+    
+    categories.forEach(category => {
+      const categoryPath = path.join(imagesDir, category);
+      if (fs.statSync(categoryPath).isDirectory()) {
+        imageList[category] = fs.readdirSync(categoryPath);
+      }
+    });
+    
+    res.json({ 
+      message: 'Image directory structure',
+      images: imageList,
+      totalCategories: categories.length
+    });
+  } catch (error) {
+    console.error('Error reading image directory:', error);
+    res.status(500).json({ error: 'Failed to read image directory' });
   }
 });
 
