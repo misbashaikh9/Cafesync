@@ -163,7 +163,7 @@ const Checkout = () => {
         }));
       console.log('Order payload items:', items); // Debug: ensure productId is present
       
-      const res = await fetch('http://localhost:3001/orders', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -296,14 +296,14 @@ const Checkout = () => {
         };
 
         console.log('Cash order payload:', orderPayload);
-        console.log('Sending request to:', 'http://localhost:3001/orders');
+        console.log('Sending request to:', `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/orders`);
         console.log('Request headers:', {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         });
 
         // Create order directly
-        const orderRes = await fetch('http://localhost:3001/orders', {
+        const orderRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/orders`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -338,7 +338,7 @@ const Checkout = () => {
 
           // Send order confirmation email
           try {
-            const emailResponse = await fetch('http://localhost:3001/send-order-email', {
+            const emailResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/send-order-email`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -479,7 +479,7 @@ const Checkout = () => {
         hasPhone: !!paymentPayload.orderData.phone
       });
       
-      const res = await fetch('http://localhost:3001/process-payment', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/process-payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -505,7 +505,7 @@ const Checkout = () => {
         
         // Send order confirmation email
         try {
-          const emailResponse = await fetch('http://localhost:3001/send-order-email', {
+          const emailResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/send-order-email`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

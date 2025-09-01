@@ -22,7 +22,7 @@ const Profile = () => {
       setLoading(true);
       setError('');
       try {
-        const res = await fetch('http://localhost:3001/profile', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/profile`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -63,7 +63,7 @@ const Profile = () => {
       }
       // If you add image upload later, append it here as well
 
-      const res = await fetch('http://localhost:3001/profile', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/profile`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
@@ -101,7 +101,7 @@ const Profile = () => {
     }
     setPwLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/profile/password', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/profile/password`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(pwForm)

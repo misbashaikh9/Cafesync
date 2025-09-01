@@ -25,7 +25,7 @@ export const CartProvider = ({ children }) => {
       console.log('[CartContext] Token:', token ? 'Token exists' : 'No token');
       
       setCartLoading(true);
-      const response = await fetch('http://localhost:3001/cart', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/cart`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -111,7 +111,7 @@ export const CartProvider = ({ children }) => {
         };
         console.log('[CartContext] Request body:', requestBody);
         
-        const response = await fetch('http://localhost:3001/cart', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/cart`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -149,7 +149,7 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/cart/${productId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/cart/${productId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -176,7 +176,7 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/cart/${productId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/cart/${productId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -205,7 +205,7 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/cart', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/cart`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

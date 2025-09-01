@@ -40,7 +40,7 @@ const ProductSuggestionsSection = () => {
     try {
       console.log('Fetching wishlist with token:', token ? 'Token exists' : 'No token');
       
-      const response = await fetch('http://localhost:3001/wishlist', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/wishlist`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -101,7 +101,7 @@ const ProductSuggestionsSection = () => {
     }
     
     try {
-      const response = await fetch(`http://localhost:3001/wishlist/${productId}`, {
+              const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/wishlist/${productId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -158,7 +158,7 @@ const ProductSuggestionsSection = () => {
         
         // Fetch other recommendations
         console.log('Fetching user recommendations...');
-        const response = await fetch('http://localhost:3001/user-recommendations', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/user-recommendations`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

@@ -57,7 +57,7 @@ const Menu = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch('http://localhost:3001/products')
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/products`)
       .then(res => res.json())
       .then((products) => {
         setProductsData(products);
@@ -95,7 +95,7 @@ const Menu = () => {
     
     try {
       setWishlistLoading(true);
-      const response = await fetch('http://localhost:3001/wishlist', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/wishlist`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -197,7 +197,7 @@ const Menu = () => {
       
       if (isCurrentlyInWishlist) {
         // Remove from wishlist
-        const response = await fetch(`http://localhost:3001/wishlist/${productId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/wishlist/${productId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -244,7 +244,7 @@ const Menu = () => {
         }
       } else {
         // Add to wishlist
-        const response = await fetch('http://localhost:3001/wishlist', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/wishlist`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -368,7 +368,7 @@ const Menu = () => {
       // Clear each wishlist item individually using the working endpoint
       for (const product of wishlistProducts) {
         try {
-          const deleteResponse = await fetch(`http://localhost:3001/wishlist/${product._id}`, {
+          const deleteResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/wishlist/${product._id}`, {
             method: 'DELETE',
             headers: {
               'Authorization': `Bearer ${token}`

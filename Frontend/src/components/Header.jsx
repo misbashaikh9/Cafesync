@@ -22,7 +22,7 @@ const Header = () => {
 
     // Always fetch username from backend
     if (token) {
-      fetch('http://localhost:3001/profile', {
+      fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/profile`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => res.json())

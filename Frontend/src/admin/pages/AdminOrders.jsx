@@ -18,7 +18,7 @@ const AdminOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('http://localhost:3001/admin/orders');
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/admin/orders`);
 
       if (response.ok) {
         const data = await response.json();
@@ -38,7 +38,7 @@ const AdminOrders = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:3001/admin/orders/${orderId}/status`, {
+              const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/admin/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

@@ -42,7 +42,7 @@ const Settings = () => {
     }
     setPwLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/profile/password', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/profile/password`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(pwForm)
@@ -97,7 +97,7 @@ const Settings = () => {
     
     setTestMessage('📧 Sending test email...');
     try {
-      const response = await fetch('http://localhost:3001/test-email', {
+              const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/admin/test-email`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

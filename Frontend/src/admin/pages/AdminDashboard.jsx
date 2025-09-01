@@ -21,7 +21,7 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       // Fetch dashboard statistics
-      const statsResponse = await fetch('http://localhost:3001/admin/stats');
+      const statsResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/admin/stats`);
 
       if (statsResponse.ok) {
         const statsData = await statsResponse.json();
@@ -29,7 +29,7 @@ const AdminDashboard = () => {
       }
 
       // Fetch recent orders
-      const ordersResponse = await fetch('http://localhost:3001/admin/recent-orders');
+              const ordersResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/admin/recent-orders`);
 
       if (ordersResponse.ok) {
         const ordersData = await ordersResponse.json();

@@ -28,8 +28,8 @@ const OrderHistory = () => {
       setError('');
       try {
         const [ordersRes, reviewsRes] = await Promise.all([
-          fetch('http://localhost:3001/orders', { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch('http://localhost:3001/reviews', { headers: { 'Authorization': `Bearer ${token}` } })
+          fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/orders`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                      fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/reviews`, { headers: { 'Authorization': `Bearer ${token}` } })
         ]);
         const ordersData = await ordersRes.json();
         const reviewsData = await reviewsRes.json();
@@ -91,7 +91,7 @@ const OrderHistory = () => {
       return;
     }
     try {
-      const res = await fetch('http://localhost:3001/feedback', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ orderId, rating, comment })
@@ -103,7 +103,7 @@ const OrderHistory = () => {
         
         // Refresh top-rated products data to update ratings on menu page
         try {
-          const topRatedRes = await fetch('http://localhost:3001/products/top-rated');
+          const topRatedRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/products/top-rated`);
           if (topRatedRes.ok) {
             const topRatedData = await topRatedRes.json();
             // Store in localStorage so Menu page can access updated data
@@ -131,7 +131,7 @@ const OrderHistory = () => {
     }
     
     try {
-      const res = await fetch('http://localhost:3001/product-review', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/product-review`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ orderId, productId, rating, comment })
@@ -142,7 +142,7 @@ const OrderHistory = () => {
         setFeedbackForm(prev => ({ ...prev, [formKey]: { ...prev[formKey], loading: false, success: 'Review submitted successfully!' } }));
         
         // Refresh reviews
-        const reviewsRes = await fetch('http://localhost:3001/reviews', { headers: { 'Authorization': `Bearer ${token}` } });
+        const reviewsRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/reviews`, { headers: { 'Authorization': `Bearer ${token}` } });
         if (reviewsRes.ok) {
           const reviewsData = await reviewsRes.json();
           setReviews(reviewsData.reviews || []);
