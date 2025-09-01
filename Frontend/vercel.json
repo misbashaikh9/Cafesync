@@ -7,6 +7,10 @@
     {
       "source": "/menu-images/(.*)",
       "destination": "/menu-images/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
